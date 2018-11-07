@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			body,ul,li{
+				padding: 0;
+				margin: 0;
+				font-family: "微软雅黑";
+				font-size: 14px;
+			}
+			li{
+				list-style: none;
+			}
+			#newsList{
+				width: 500px;
+				border: 1px solid #CECECE;
+			}
+			#newsList li{
+				height: 36px;
+				line-height: 36px;
+				padding: 0 8px;
+				margin: 0 10px;
+				border-bottom: 1px solid #CECECE;
+			}
+			#newsList li:last-child{
+				border-bottom: none;
+			}
+			#pages li{
+				float: left;
+				margin: 10px;
+				padding: 10px;
+				border: 1px solid red;
+				cursor: pointer;
+			}
+			#pages li span{
+				display: inline-block;
+				padding: 10px;
+				margin: 0 10px;
+				border: 1px solid red;
+				cursor: pointer;
+			}
+			#pages .pageNum{
+				border: none;
+				padding: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<ul id="newsList">
+			
+		</ul>
+		<ul id="pages">
+			<li>首页</li><li>上一页</li><li class="pageNum"></li><li>下一页</li><li>尾页</li>
+		</ul>
+		<script src="ajax.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+		ajax("data.json").then(function(data){
+			data = JSON.parse(data);
+			var numsPerPage = 5;//每页显示的条数
+			var totalNums = data.length;//总数量
+			var pages = Math.ceil(totalNums/numsPerPage);
+			//显示页码
+			var oPageNum = document.getElementsByClassName("pageNum")[0];
+			for(var i = 0; i < pages; i++){
+				oPageNum.innerHTML += `<span>${i+1}</span>`;
+			}
+			
+			var oList = document.getElementById("newsList");
+			var index = 0;//表示当前页
+			
+			//默认显示第一页
+			showNews(index);
+			
+			//点击按钮  显示对应页码的新闻
+			var oPages = document.getElementById("pages");
+			var aLi = oPages.children;
+			//首页
+			aLi[0].onclick = function(){
+				index = 0;
+				showNews(index);
+			}
+			//上一页
+			aLi[1].onclick = function(){
+				
+				index--;
+				if(index < 0 ){
+					index = 0;
+				}
+				
+				showNews(index);
+				
+			}
+
+			//下一页
+			aLi[aLi.length-2].onclick = function(){
+				index++;
+				if(index>pages-1){
+					index = pages-1;
+				}
+				showNews(index);
+			}
+			
+			//尾页
+			aLi[aLi.length-1].onclick = function(){
+				index = pages-1;
+				showNews(index);
+			}		
+			
+			//具体页码
+			var aSpans = oPageNum.children;
+			for(let j = 0; j < aSpans.length; j++){
+				aSpans[j].onclick = function(){
+					index = j;
+					showNews(index);
+					
+				}
+			}
+			
+			function showNews(index){
+				oList.innerHTML = "";
+				for(var i = index*numsPerPage; i < Math.min((index+1)*numsPerPage,data.length); i++){
+					oList.innerHTML += `<li>${data[i]}</li>`;
+				}
+			}
+			
+			
+		})
+			
+		</script>
+		
+	</body>
+</html>
